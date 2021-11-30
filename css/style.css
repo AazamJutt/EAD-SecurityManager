@@ -1,0 +1,106 @@
+*{
+    font-family: Verdana, Geneva, Tahoma, serif;
+    margin: 0px;
+}
+body {
+    position: relative;
+    background-image: url("assets/bg.jpg");
+    background-size: cover;
+}
+h1{
+    color: #282a2e;
+    font-size: 300%;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+select{
+    transform:scaleX(1.06); 
+    margin-left: 8px;
+}
+.content{
+    display: flex;
+    height: 90vh;
+    padding: 1%;
+    align-items: center;
+    justify-content: center;
+}
+.login-form{
+    display: inline-block;
+    background-color: white;
+    box-shadow: 0 0 3px #000000;
+}
+.login-form h3{
+    display: block;
+    box-shadow: 0 0 3px #000000;
+    width: 240px;
+    background-color: rgb(74, 75, 78);
+    color: white;
+    padding: 20px 30px;
+}
+.footer{
+    background-color: rgb(74, 75, 78);
+    color: white;
+    padding: 10px 20px;
+}
+.login-form form{
+    width: 300px;    
+}
+.form-content{
+    padding: 20px;
+}
+.login-form label{
+    display: block;
+    padding: .5rem 0;
+}
+.login-form input, select{
+    box-shadow: 0 0 2px #000000;
+    display: block;
+    background-color: hsl(216, 12%, 92%);
+    border: none;
+    border-radius: 4px;
+    padding: .5rem;
+    margin-bottom: .5rem;
+    width: 90%;
+}
+button, a :hover{
+    cursor:pointer;
+}
+.btn{
+    cursor:pointer;
+    margin-left: 50%;
+    width: 50% !important;
+}
+
+
+
+/* Admin Home Page */
+
+.nav{
+    background-color: rgb(55, 57, 61);
+    color: white;
+}
+.nav a{
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    padding: 10px 20px;
+}
+.nav a:hover{
+    background-color: rgb(72, 74, 77);
+}
+.welcome{
+    margin: 20px;
+}
+
+/* User Management Page */
+table{
+    box-shadow: 0 0 3px #000000;
+    border: 1px solid;
+    border-collapse: collapse;
+    margin: 30px;
+    background-color: white;
+}
+td, th{
+    padding: 20px;
+    border: 1px solid black;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role-Permission Management</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../SecurityManager.js"></script>
+<body onload="loadRolePermissions()">
+    <div class="bg-img"></div>
+    <div class="nav">
+        <a href="admin.html">Home</a>
+        <a href="user-mangement.html">User Management</a>
+        <a href="role-management.html">Role Management</a>
+        <a href="permission-management.html">Permission Management</a>
+        <a href="role-permission-management.html">Role-Permission Management</a>
+        <a href="user-role-management.html">User-Role Management</a>
+        <a href="../index.html">Logout</a>
+    </div>
+    <div class="content content-2">
+        <div class="login-form">
+            <h3>Role-Permission Management</h3>
+            <form  onsubmit= "saveRolePermissionsObject()">
+                <div class="form-content">
+                    <label for="text">Role:</label>
+                    <select id="select-role"">
+                    </select>
+                    <label for="text">Permissions:</label>
+                    <select id="select-perm">
+                    </select>
+                </div>
+                <div class="footer">
+                    <input class="btn" type="submit" value="Save">
+                </div>
+            </form>
+        </div>
+    <table id="role-permissions">
+        <tr>
+            <th>ID</th>
+            <th>Role</th>
+            <th>Permissions</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        <tbody id="role-permission-tbody"></tbody>
+    </table>
+   </div>
+</body>
+</html>

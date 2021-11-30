@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permission Management</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../SecurityManager.js"></script>
+</head>
+<body onload="loadPermissions()">
+    <div class="bg-img"></div>
+    <div class="nav">
+        <a href="admin.html">Home</a>
+        <a href="user-mangement.html">User Management</a>
+        <a href="role-management.html">Role Management</a>
+        <a href="permission-management.html">Permission Management</a>
+        <a href="role-permission-management.html">Role-Permission Management</a>
+        <a href="user-role-management.html">User-Role Management</a>
+        <a href="../index.html">Logout</a>
+    </div>
+    <div class="content content-2">
+        <div class="login-form">
+            <h3>Permission Management</h3>
+            <form  onsubmit= "savePermissionObject()">
+                <div class="form-content">
+                    <label for="text">Permission Name:</label>
+                    <input type="text" id="perm-name" required>
+                    <label for="text">Description:</label>
+                    <input type="text" id="perm-desc" required>
+                </div>
+                <div class="footer">
+                    <input class="btn" type="submit" value="Save">
+                </div>
+            </form>
+        </div>
+    <table id="permissions">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        <tbody id="permissions-tbody"></tbody>
+    </table>
+</body>
+</html>

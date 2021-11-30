@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="SecurityManager.js"></script>
+    <title>Login</title>
+</head>
+
+<body>
+    <div class="bg-img"></div>
+    <div class="content">
+        <div>
+            <h1>Security Manager</h1>
+            <div class="login-form">
+                <form onsubmit="return loginAdmin()">
+                    <h3>Login Admin</h3>
+                    <div class="form-content">
+                        <label for="text">Username:</label>
+                        <input type="text" id="admin-login" required />
+                        <label for="text">Password:</label>
+                        <input type="password" id="admin-password" required />
+                    </div>
+                    <div class="footer">
+                        <input class="btn" type="submit" value="Login" />
+                    </div>
+                </form>
+            </div>
+            <div class="login-form" action="submit">
+                <form onsubmit="loginAdmin()">    
+                    <h3>Login User</h3>
+                    <div class="form-content">
+                        <label for="text">Username:</label>
+                        <input type="text" id="user-login" required />
+                        <label for="text">Password:</label>
+                        <input type="password" id="user-password" required />
+                    </div>
+                    <div class="footer">
+                        <input class="btn" type="submit" value="Login" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
