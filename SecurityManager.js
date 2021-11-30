@@ -282,7 +282,9 @@ function loginAdmin() {
     }
 }
 
-
+// Globals
+var editMode = false
+var editId = -1;
 
 // User Managerment Page
 function loadUserManagePage() {
@@ -337,7 +339,6 @@ function validateUser(new_user) {
     return true
 }
 
-var editMode = false
 function saveUserObject() {
     var user = {
         Login: gid("user-login").value,
@@ -352,11 +353,11 @@ function saveUserObject() {
         return
     }
     else if(editMode) {
-        // Add Id if user already exists
-        var id = getUserIdbyLogin(user)
-        if (id != -1) {
-            user.ID = id
+        // Add Id if object already exists
+        if (editId != -1) {
+            user.ID = editId
         }
+        editId = -1
         editMode = false
     }
     SecurityManager.SaveUser(user, reload, error);
@@ -370,11 +371,13 @@ function editUser(id) {
     editMode = true
     var row = gid("users").rows[Number(id) + 1]
     id = Number(row.cells[0].innerText)
+    editId = id
     var user = SecurityManager.GetUserById(id)
     gid("user-login").value = user.Login
     gid("user-pass").value = ""
     gid("user-name").value = user.Name
     gid("user-email").value = user.Email
+    gid("user-email").disabled = true
     gid("countries").value = Number(user.Country)
     addCities()
     gid("cities").value = Number(user.City)
@@ -475,7 +478,7 @@ function savePermissionObject() {
         return false
     }
     else if(editMode) {
-        // Add Id if user already exists
+        // Add Id if object already exists
         var id = getPermissionId(permission)
         if (id != -1) {
             permission.ID = id
@@ -556,7 +559,7 @@ function saveRoleObject() {
         return false
     }
     else if(editMode) {
-        // Add Id if user already exists
+        // Add Id if object already exists
         var id = getRoleId(role)
         if (id != -1) {
             role.ID = id
@@ -608,6 +611,7 @@ function editRolePermissions(id) {
     editMode = true
     var row = gid("role-permissions").rows[Number(id) + 1]
     id = Number(row.cells[0].innerText)
+    editId = id;
     var rp = SecurityManager.GetRolePermissionById(id)
     gid("select-role").value = rp.Role
     gid("select-role").disabled = true
@@ -636,11 +640,11 @@ function saveRolePermissionsObject() {
         return false
     }
     else if(editMode) {
-        // Add Id if user already exists
-        var id = getRolePermissionsId(rolePermission)
-        if (id != -1) {
-            rolePermission.ID = id
+        // Add Id if object already exists
+        if (editId != -1) {
+            rolePermission.ID = editId
         }
+        editId = -1
         editMode = false
     }
     SecurityManager.SaveRolePermission(rolePermission, reload, error);
@@ -688,8 +692,8 @@ function loadRolePermissions() {
 function validateUserRoles(obj){
     var userRoles = SecurityManager.GetAllUserRoles()
     console.log(userRoles)
-    for (const role of UserRoles) {
-        if (role == obj.User && userRoles.Role == obj.Role) {
+    for (const userRole of userRoles) {
+        if (userRole.Role == obj.Role && userRole.User == obj.User) {
             return false
         }
     }
@@ -699,7 +703,7 @@ function validateUserRoles(obj){
 function getUserRolesId(obj) {
     var userRoles = SecurityManager.GetAllUserRoles()
     for (const userRole of userRoles) {
-        if (userRole.User == obj.User) {
+        if (userRole.Role == obj.Role) {
             return userRole.ID
         }
     }
@@ -710,18 +714,19 @@ function editUserRoles(id) {
     editMode = true
     var row = gid("user-roles").rows[Number(id) + 1]
     id = Number(row.cells[0].innerText)
-    var rp = SecurityManager.GetRolePermissionById(id)
-    gid("select-role").value = rp.Role
-    gid("select-role").disabled = true
-    gid("select-perm").value = rp.Permission
+    editId = id
+    var ur = SecurityManager.GetUserRoleById(id)
+    gid("select-user-role").value = ur.Role
+    gid("select-user-role").disabled = true
+    gid("select-user").value = ur.Permission
 }
 
 function deleteUserRoles(id) {
     var r = confirm("Are you sure you want to Delete?");
     if (r) {
-        var row = gid("role-permissions").rows[Number(id) + 1]
+        var row = gid("user-roles").rows[Number(id) + 1]
         id = Number(row.cells[0].innerText)
-        SecurityManager.DeleteRolePermission(Number(id), reload, error)
+        SecurityManager.DeleteUserRole(Number(id), reload, error)
     } else {
         return;
     }
@@ -733,19 +738,22 @@ function saveUserRolesObject() {
         Role: gid("select-user-role").value,
         User: gid("select-user").value
     }
+    console.log(userRole)
     if (!editMode && !validateUserRoles(userRole)) {
         alert("User-Role already exists")
         return false
     }
     else if(editMode) {
-        // Add Id if user already exists
-        var id = getUserRolesId(userRole)
-        if (id != -1) {
-            userRole.ID = id
+        // Add Id if object already exists
+        if (editId != -1) {
+            userRole.ID = editId
         }
+        
+        editId = -1
         editMode = false
     }
-    SecurityManager.SaveRolePermission(userRole, reload, error);
+    console.log(userRole)
+    SecurityManager.SaveUserRole(userRole, reload, error);
 }
 
 function loadUsers(){
@@ -762,13 +770,13 @@ function loadUsers(){
 function loadUserRoles() {
     loadRoleOptions(gid("select-user-role"))
     loadUsers()
-    var table = gid("role-permission-tbody");
+    var table = gid("user-role-tbody");
     var data = SecurityManager.GetAllUserRoles()
     for (let i = 0; i < data.length; i++) {
         var row = document.createElement("tr");
         row.appendChild(getTD(data[i].ID))
         row.appendChild(getTD(data[i].Role))
-        row.appendChild(getTD(data[i].Permission))
+        row.appendChild(getTD(data[i].User))
         row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editUserRoles(this.id)">Edit</button></td>`
         row.innerHTML += `<td><button id=${i} onclick="deleteUserRoles(this.id)" style="color:red;">Delete</button></td>`
         table.appendChild(row)
