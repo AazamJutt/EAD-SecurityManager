@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,7 +8,93 @@
     <title>Role Management</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../SecurityManager.js"></script>
+    <script>
+        // Globals
+        var editMode = false
+        var editId = -1;
+        
+        function validateRole(obj) {
+            var roles = SecurityManager.GetAllPermissions()
+            console.log(roles)
+            for (const role of roles) {
+                if (role.Name == obj.Name) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        function getRoleId(obj) {
+            var roles = SecurityManager.GetAllRoles()
+            for (const role of roles) {
+                if (role.Name == obj.Name) {
+                    return perm.ID
+                }
+            }
+            return -1
+        }
+
+        function editRole(id) {
+            editMode = true
+            var row = gid("roles").rows[Number(id) + 1]
+            id = Number(row.cells[0].innerText)
+            var perm = SecurityManager.GetRoleById(id)
+            gid("role-name").value = perm.Name
+            gid("role-name").disabled = true
+            gid("role-desc").value = perm.Description
+
+        }
+
+        function deleteRole(id) {
+            var r = confirm("Are you sure you want to Delete?");
+            if (r) {
+                var row = gid("roles").rows[Number(id) + 1]
+                id = Number(row.cells[0].innerText)
+                SecurityManager.DeleteRole(Number(id), reload, error)
+            } else {
+                return;
+            }
+        }
+
+
+        function saveRoleObject() {
+            var role = {
+                Name: gid("role-name").value,
+                Description: gid("role-desc").value
+            }
+            console.log(role)
+            if (!editMode && !validateRole(role)) {
+                alert("role with this Name already exists")
+                return false
+            }
+            else if (editMode) {
+                // Add Id if object already exists
+                var id = getRoleId(role)
+                if (id != -1) {
+                    role.ID = id
+                }
+                editMode = false
+            }
+            SecurityManager.SaveRole(role, reload, error);
+        }
+
+        function loadRoles() {
+            var table = gid("roles-tbody");
+            var perms = SecurityManager.GetAllRoles()
+            for (let i = 0; i < perms.length; i++) {
+                var row = document.createElement("tr");
+                row.appendChild(getTD(perms[i].ID))
+                row.appendChild(getTD(perms[i].Name))
+                row.appendChild(getTD(perms[i].Description))
+                row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editRole(this.id)">Edit</button></td>`
+                row.innerHTML += `<td><button id=${i} onclick="deleteRole(this.id)" style="color:red;">Delete</button></td>`
+                table.appendChild(row)
+            }
+        }
+
+    </script>
 </head>
+
 <body onload="loadRoles()">
     <div class="bg-img"></div>
     <div class="nav">
@@ -22,7 +109,7 @@
     <div class="content content-2">
         <div class="login-form">
             <h3>Role Management</h3>
-            <form  onsubmit= "saveRoleObject()">
+            <form onsubmit="saveRoleObject()">
                 <div class="form-content">
                     <label for="text">Role Name:</label>
                     <input type="text" id="role-name" required>
@@ -34,15 +121,16 @@
                 </div>
             </form>
         </div>
-    <table id="roles">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
-        <tbody id="roles-tbody"></tbody>
-    </table>
+        <table id="roles">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            <tbody id="roles-tbody"></tbody>
+        </table>
 </body>
+
 </html>

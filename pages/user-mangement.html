@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,7 +8,146 @@
     <title>User Management</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../SecurityManager.js"></script>
+    <script>
+        // Globals
+        var editMode = false
+        var editId = -1;
+
+        // User Managerment Page
+        function loadUserManagePage() {
+            addCountries()
+            addCities()
+            loadUserTable()
+        }
+        function addCountries() {
+            var s = gid("countries");
+            var countries = SecurityManager.GetCountries();
+            for (const country of countries) {
+                var opt = document.createElement("option");
+                opt.value = country.CountryID;
+                opt.innerText = country.Name;
+                s.appendChild(opt);
+            }
+            s.selected = s.options[0];
+        }
+        function removeOptions(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for (i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
+
+        function addCities() {
+            var selected = gid("countries").value;
+            var s = gid("cities");
+            removeOptions(s);
+            var cities = SecurityManager.GetCitiesByCountryId(selected);
+            for (const city of cities) {
+                var opt = document.createElement("option");
+                opt.value = city.CityID;
+                opt.innerText = city.Name;
+                s.appendChild(opt);
+            }
+        }
+
+        function getTD(data) {
+            var td = document.createElement("td");
+            td.innerText = data;
+            return td;
+        }
+
+        function validateUser(new_user) {
+            var users = SecurityManager.GetAllUsers()
+            for (const user of users) {
+                if (user.Login == new_user.Login || user.Email == new_user.Email) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        function saveUserObject() {
+            var user = {
+                Login: gid("user-login").value,
+                Password: gid("user-pass").value,
+                Name: gid("user-name").value,
+                Email: gid("user-email").value,
+                Country: gid("countries").value,
+                City: gid("cities").value
+            }
+            if (!editMode && !validateUser(user)) {
+                alert("User with this Login or Email already exists")
+                return
+            }
+            else if (editMode) {
+                // Add Id if object already exists
+                if (editId != -1) {
+                    user.ID = editId
+                }
+                editId = -1
+                editMode = false
+            }
+            SecurityManager.SaveUser(user, reload, error);
+        }
+
+        function error(msg) {
+            console.log(msg)
+        }
+
+        function editUser(id) {
+            editMode = true
+            var row = gid("users").rows[Number(id) + 1]
+            id = Number(row.cells[0].innerText)
+            editId = id
+            var user = SecurityManager.GetUserById(id)
+            gid("user-login").value = user.Login
+            gid("user-pass").value = ""
+            gid("user-name").value = user.Name
+            gid("user-email").value = user.Email
+            gid("user-email").disabled = true
+            gid("countries").value = Number(user.Country)
+            addCities()
+            gid("cities").value = Number(user.City)
+        }
+        function reload() {
+            location.reload()
+        }
+        function getUserIdbyLogin(user) {
+            var users = SecurityManager.GetAllUsers()
+            for (const u of users) {
+                if (u.Login == user.Login || u.Email == user.Email) {
+                    return users[i].ID
+                }
+            }
+            return -1
+        }
+        function deleteUser(id) {
+            var r = confirm("Are you sure you want to Delete?");
+            if (r) {
+                var row = gid("users").rows[Number(id) + 1]
+                id = Number(row.cells[0].innerText)
+                SecurityManager.DeleteUser(Number(id), reload, error)
+            } else {
+                return;
+            }
+        }
+
+        function loadUserTable() {
+            var table = gid("users-tbody");
+            var users = SecurityManager.GetAllUsers()
+            for (let i = 0; i < users.length; i++) {
+                var row = document.createElement("tr");
+                row.appendChild(getTD(users[i].ID))
+                row.appendChild(getTD(users[i].Name))
+                row.appendChild(getTD(users[i].Email))
+                row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editUser(this.id)">Edit</button></td>`
+                row.innerHTML += `<td><button id=${i} onclick="deleteUser(this.id)" style="color:red;">Delete</button></td>`
+                table.appendChild(row)
+            }
+        }
+    </script>
 </head>
+
 <body onload="loadUserManagePage()">
     <div class="bg-img"></div>
     <div class="nav">
@@ -19,10 +159,10 @@
         <a href="user-role-management.html">User-Role Management</a>
         <a href="../index.html">Logout</a>
     </div>
-   <div class="content content-2">
+    <div class="content content-2">
         <div class="login-form">
             <h3>User Management</h3>
-            <form  onsubmit= "saveUserObject()">
+            <form onsubmit="saveUserObject()">
                 <div class="form-content">
                     <label for="text">Login:</label>
                     <input type="text" id="user-login" required>
@@ -33,7 +173,7 @@
                     <label for="text">Email:</label>
                     <input type="email" id="user-email" required>
                     <label for="text">Country:</label>
-                    <select name="" id="countries"  onchange="addCities()">
+                    <select name="" id="countries" onchange="addCities()">
                     </select>
                     <label for="text">City:</label>
                     <select name="" id="cities">
@@ -44,16 +184,17 @@
                 </div>
             </form>
         </div>
-    <table id="users">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
-        <tbody id="users-tbody"></tbody>
-    </table>
-   </div>
+        <table id="users">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            <tbody id="users-tbody"></tbody>
+        </table>
+    </div>
 </body>
+
 </html>

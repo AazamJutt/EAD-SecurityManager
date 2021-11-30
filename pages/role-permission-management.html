@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,113 @@
     <title>Role-Permission Management</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../SecurityManager.js"></script>
+    <script>
+        // Globals
+        var editMode = false
+        var editId = -1;
+
+        function validateRolePermissions(obj) {
+            var rolePermissionss = SecurityManager.GetAllRolePermissions()
+            console.log(rolePermissionss)
+            for (const RolePermissions of rolePermissionss) {
+                if (RolePermissions.Role == obj.Role && RolePermissions.Permission == obj.Permission) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        function getRolePermissionsId(obj) {
+            var rolePermissions = SecurityManager.GetAllRolePermissions()
+            for (const rolePermission of rolePermissions) {
+                if (rolePermission.Role == obj.Role) {
+                    return rolePermission.ID
+                }
+            }
+            return -1
+        }
+
+        function editRolePermissions(id) {
+            editMode = true
+            var row = gid("role-permissions").rows[Number(id) + 1]
+            id = Number(row.cells[0].innerText)
+            editId = id;
+            var rp = SecurityManager.GetRolePermissionById(id)
+            gid("select-role").value = rp.Role
+            gid("select-role").disabled = true
+            gid("select-perm").value = rp.Permission
+        }
+
+        function deleteRolePermissions(id) {
+            var r = confirm("Are you sure you want to Delete?");
+            if (r) {
+                var row = gid("role-permissions").rows[Number(id) + 1]
+                id = Number(row.cells[0].innerText)
+                SecurityManager.DeleteRolePermission(Number(id), reload, error)
+            } else {
+                return;
+            }
+        }
+
+
+        function saveRolePermissionsObject() {
+            var rolePermission = {
+                Role: gid("select-role").value,
+                Permission: gid("select-perm").value
+            }
+            if (!editMode && !validateRolePermissions(rolePermission)) {
+                alert("Role-Permission already exists")
+                return false
+            }
+            else if (editMode) {
+                // Add Id if object already exists
+                if (editId != -1) {
+                    rolePermission.ID = editId
+                }
+                editId = -1
+                editMode = false
+            }
+            SecurityManager.SaveRolePermission(rolePermission, reload, error);
+        }
+
+        function loadRoleOptions(list) {
+            var roles = SecurityManager.GetAllRoles()
+            for (const role of roles) {
+                var opt = document.createElement("option");
+                opt.value = role.Name;
+                opt.innerText = role.Name;
+                list.appendChild(opt);
+            }
+        }
+
+        function loadPermOptions() {
+            var permissions = SecurityManager.GetAllPermissions()
+            var s = gid("select-perm");
+            for (const perm of permissions) {
+                var opt = document.createElement("option");
+                opt.value = perm.Name;
+                opt.innerText = perm.Name;
+                s.appendChild(opt);
+            }
+        }
+
+        function loadRolePermissions() {
+            loadRoleOptions(gid("select-role"))
+            loadPermOptions()
+            var table = gid("role-permission-tbody");
+            var data = SecurityManager.GetAllRolePermissions()
+            for (let i = 0; i < data.length; i++) {
+                var row = document.createElement("tr");
+                row.appendChild(getTD(data[i].ID))
+                row.appendChild(getTD(data[i].Role))
+                row.appendChild(getTD(data[i].Permission))
+                row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editRolePermissions(this.id)">Edit</button></td>`
+                row.innerHTML += `<td><button id=${i} onclick="deleteRolePermissions(this.id)" style="color:red;">Delete</button></td>`
+                table.appendChild(row)
+            }
+        }
+    </script>
+
 <body onload="loadRolePermissions()">
     <div class="bg-img"></div>
     <div class="nav">
@@ -21,30 +129,31 @@
     <div class="content content-2">
         <div class="login-form">
             <h3>Role-Permission Management</h3>
-            <form  onsubmit= "saveRolePermissionsObject()">
+            <form onsubmit="saveRolePermissionsObject()">
                 <div class="form-content">
                     <label for="text">Role:</label>
                     <select id="select-role"">
                     </select>
-                    <label for="text">Permissions:</label>
-                    <select id="select-perm">
-                    </select>
+                    <label for=" text">Permissions:</label>
+                        <select id="select-perm">
+                        </select>
                 </div>
                 <div class="footer">
                     <input class="btn" type="submit" value="Save">
                 </div>
             </form>
         </div>
-    <table id="role-permissions">
-        <tr>
-            <th>ID</th>
-            <th>Role</th>
-            <th>Permissions</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
-        <tbody id="role-permission-tbody"></tbody>
-    </table>
-   </div>
+        <table id="role-permissions">
+            <tr>
+                <th>ID</th>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            <tbody id="role-permission-tbody"></tbody>
+        </table>
+    </div>
 </body>
+
 </html>

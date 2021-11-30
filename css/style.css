@@ -5,7 +5,7 @@
 body {
     position: relative;
     background-image: url("../assets/bg.jpg");
-    background-size: cover;
+    background-size: 15%;
 }
 h1{
     color: #282a2e;
@@ -27,11 +27,11 @@ select{
 .login-form{
     display: inline-block;
     background-color: white;
-    box-shadow: 0 0 3px #000000;
+    box-shadow: 0 0 5px #000000;
 }
 .login-form h3{
     display: block;
-    box-shadow: 0 0 3px #000000;
+    box-shadow: 0 0 5px #000000;
     width: 240px;
     background-color: rgb(74, 75, 78);
     color: white;
@@ -94,7 +94,7 @@ button, a :hover{
 
 /* User Management Page */
 table{
-    box-shadow: 0 0 3px #000000;
+    box-shadow: 0 0 5px #000000;
     border: 1px solid;
     border-collapse: collapse;
     margin: 30px;

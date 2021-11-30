@@ -8,6 +8,16 @@
     <link rel="stylesheet" href="css/style.css" />
     <script src="SecurityManager.js"></script>
     <title>Login</title>
+    <script>
+        function loginAdmin() {
+            var login = gid("admin-login").value;
+            var pass = gid("admin-password").value;
+            if (SecurityManager.ValidateAdmin(login, pass)) {
+                window.location.href = "pages/admin.html";
+                return false;
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -30,7 +40,7 @@
                 </form>
             </div>
             <div class="login-form" action="submit">
-                <form onsubmit="loginAdmin()">    
+                <form onsubmit="loginAdmin()">
                     <h3>Login User</h3>
                     <div class="form-content">
                         <label for="text">Username:</label>
