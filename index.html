@@ -17,6 +17,29 @@
                 return false;
             }
         }
+
+        function validateUser(login,pass){
+            var users = SecurityManager.GetAllUsers();
+            for(const user of users){
+                if(user.Login == login && user.Password == pass){
+                    return user.ID
+                }
+            }
+            return -1;
+        }
+
+        function loginUser() {
+            var login = gid("user-login").value;
+            var pass = gid("user-password").value;
+            id = validateUser(login,pass);
+            if(id==-1){
+                alert("Invalid Login or Password")
+                return false
+            }
+            document.cookie=`userId=${id}`
+            window.location.href = "pages/user.html";
+            return false;
+        }
     </script>
 </head>
 
@@ -40,7 +63,7 @@
                 </form>
             </div>
             <div class="login-form" action="submit">
-                <form onsubmit="loginAdmin()">
+                <form onsubmit="return loginUser()">
                     <h3>Login User</h3>
                     <div class="form-content">
                         <label for="text">Username:</label>

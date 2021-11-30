@@ -23,7 +23,11 @@
             }
             return true
         }
-
+        function getTD(data) {
+            var td = document.createElement("td");
+            td.innerText = data;
+            return td;
+        }
         function getRolePermissionsId(obj) {
             var rolePermissions = SecurityManager.GetAllRolePermissions()
             for (const rolePermission of rolePermissions) {

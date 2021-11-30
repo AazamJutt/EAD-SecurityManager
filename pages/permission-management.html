@@ -24,7 +24,11 @@
             }
             return true
         }
-
+        function getTD(data) {
+            var td = document.createElement("td");
+            td.innerText = data;
+            return td;
+        }
         function getPermissionId(obj) {
             var perms = SecurityManager.GetAllPermissions()
             for (const perm of perms) {

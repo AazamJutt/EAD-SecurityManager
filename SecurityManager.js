@@ -267,3 +267,13 @@ SecurityManager.Initialize();
 function gid(id) {
     return document.getElementById(id);
 }
+
+
+
+function error(msg) {
+    console.log(msg)
+}
+
+function reload() {
+    location.reload()
+}

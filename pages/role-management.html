@@ -12,7 +12,7 @@
         // Globals
         var editMode = false
         var editId = -1;
-        
+
         function validateRole(obj) {
             var roles = SecurityManager.GetAllPermissions()
             console.log(roles)
@@ -23,7 +23,11 @@
             }
             return true
         }
-
+        function getTD(data) {
+            var td = document.createElement("td");
+            td.innerText = data;
+            return td;
+        }
         function getRoleId(obj) {
             var roles = SecurityManager.GetAllRoles()
             for (const role of roles) {

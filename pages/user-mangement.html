@@ -90,10 +90,6 @@
             SecurityManager.SaveUser(user, reload, error);
         }
 
-        function error(msg) {
-            console.log(msg)
-        }
-
         function editUser(id) {
             editMode = true
             var row = gid("users").rows[Number(id) + 1]
@@ -108,9 +104,6 @@
             gid("countries").value = Number(user.Country)
             addCities()
             gid("cities").value = Number(user.City)
-        }
-        function reload() {
-            location.reload()
         }
         function getUserIdbyLogin(user) {
             var users = SecurityManager.GetAllUsers()

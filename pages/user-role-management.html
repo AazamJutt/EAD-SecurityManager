@@ -23,7 +23,15 @@
             }
             return true
         }
-
+        function loadRoleOptions(list) {
+            var roles = SecurityManager.GetAllRoles()
+            for (const role of roles) {
+                var opt = document.createElement("option");
+                opt.value = role.Name;
+                opt.innerText = role.Name;
+                list.appendChild(opt);
+            }
+        }
         function getUserRolesId(obj) {
             var userRoles = SecurityManager.GetAllUserRoles()
             for (const userRole of userRoles) {
@@ -76,7 +84,6 @@
                 editId = -1
                 editMode = false
             }
-            console.log(userRole)
             SecurityManager.SaveUserRole(userRole, reload, error);
         }
 
@@ -90,7 +97,11 @@
                 s.appendChild(opt);
             }
         }
-
+        function getTD(data) {
+            var td = document.createElement("td");
+            td.innerText = data;
+            return td;
+        }
         function loadUserRoles() {
             loadRoleOptions(gid("select-user-role"))
             loadUsers()
