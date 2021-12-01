@@ -14,10 +14,10 @@
         var editId = -1;
 
         function validateUserRoles(obj) {
-            var userRoles = SecurityManager.GetAllUserRoles()
-            console.log(userRoles)
-            for (const userRole of userRoles) {
-                if (userRole.Role == obj.Role && userRole.User == obj.User) {
+            var userRole = SecurityManager.GetAllUserRoles()
+            console.log(userRole)
+            for (const UserRoles of userRole) {
+                if (UserRoles.Role == obj.Role && UserRoles.User == obj.User) {
                     return false
                 }
             }
@@ -32,55 +32,56 @@
                 list.appendChild(opt);
             }
         }
-        function getUserRolesId(obj) {
-            var userRoles = SecurityManager.GetAllUserRoles()
-            for (const userRole of userRoles) {
-                if (userRole.Role == obj.Role) {
-                    return userRole.ID
-                }
-            }
-            return -1
-        }
 
         function editUserRoles(id) {
             editMode = true
-            var row = gid("user-roles").rows[Number(id) + 1]
-            id = Number(row.cells[0].innerText)
-            editId = id
+            editId = id;
             var ur = SecurityManager.GetUserRoleById(id)
-            gid("select-user-role").value = ur.Role
-            gid("select-user-role").disabled = true
-            gid("select-user").value = ur.Permission
+            gid("select-user-role").value = SecurityManager.GetRoleById(ur.Role).Name
+            gid("select-user").disabled = true
+            gid("select-user").value = SecurityManager.GetUserById(ur.User).Name
         }
 
         function deleteUserRoles(id) {
             var r = confirm("Are you sure you want to Delete?");
+            alert(id)
             if (r) {
-                var row = gid("user-roles").rows[Number(id) + 1]
-                id = Number(row.cells[0].innerText)
                 SecurityManager.DeleteUserRole(Number(id), reload, error)
             } else {
                 return;
             }
         }
 
+        function getRoleId(name) {
+            var roles = SecurityManager.GetAllRoles();
+            for (const role of roles) {
+                if (role.Name == name) {
+                    return role.ID
+                }
+            }
+        }
 
+        function getUserId(name) {
+            var users = SecurityManager.GetAllUsers();
+            for (const user of users) {
+                if (user.Name == name) {
+                    return user.ID
+                }
+            }
+        }
         function saveUserRolesObject() {
             var userRole = {
-                Role: gid("select-user-role").value,
-                User: gid("select-user").value
+                Role: getRoleId(gid("select-user-role").value),
+                User: getUserId(gid("select-user").value)
             }
-            console.log(userRole)
             if (!editMode && !validateUserRoles(userRole)) {
                 alert("User-Role already exists")
                 return false
-            }
-            else if (editMode) {
+            } else if (editMode) {
                 // Add Id if object already exists
                 if (editId != -1) {
                     userRole.ID = editId
                 }
-
                 editId = -1
                 editMode = false
             }
@@ -107,14 +108,20 @@
             loadUsers()
             var table = gid("user-role-tbody");
             var data = SecurityManager.GetAllUserRoles()
-            for (let i = 0; i < data.length; i++) {
-                var row = document.createElement("tr");
-                row.appendChild(getTD(data[i].ID))
-                row.appendChild(getTD(data[i].Role))
-                row.appendChild(getTD(data[i].User))
-                row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editUserRoles(this.id)">Edit</button></td>`
-                row.innerHTML += `<td><button id=${i} onclick="deleteUserRoles(this.id)" style="color:red;">Delete</button></td>`
-                table.appendChild(row)
+            for (const val of data) {
+                const r = SecurityManager.GetRoleById(Number(val.Role))
+                const u = SecurityManager.GetUserById(Number(val.User))
+                if (typeof(r) != 'undefined' && typeof(u) != 'undefined') {
+                    var row = document.createElement("tr");
+                    row.appendChild(getTD(val.ID))
+                    row.appendChild(getTD(u.Name))
+                    row.appendChild(getTD(r.Name))
+                    row.innerHTML +=
+                        `<td><button id=${val.ID} class="edit-btn" onclick="editUserRoles(${val.ID})">Edit</button></td>`
+                    row.innerHTML +=
+                        `<td><button id=${val.ID} onclick="deleteUserRoles(${val.ID})" style="color:red;">Delete</button></td>`
+                    table.appendChild(row)
+                }
             }
         }
     </script>

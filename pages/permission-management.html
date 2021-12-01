@@ -29,23 +29,13 @@
             td.innerText = data;
             return td;
         }
-        function getPermissionId(obj) {
-            var perms = SecurityManager.GetAllPermissions()
-            for (const perm of perms) {
-                if (perm.Name == obj.Name) {
-                    return perm.ID
-                }
-            }
-            return -1
-        }
-
         function editPermission(id) {
             editMode = true
             var row = gid("permissions").rows[Number(id) + 1]
             id = Number(row.cells[0].innerText)
+            editId = id
             var perm = SecurityManager.GetPermissionById(id)
             gid("perm-name").value = perm.Name
-            gid("perm-name").disabled = true
             gid("perm-desc").value = perm.Description
 
         }
@@ -67,18 +57,17 @@
                 Name: gid("perm-name").value,
                 Description: gid("perm-desc").value
             }
-            console.log(permission)
             if (!editMode && !validatePermission(permission)) {
                 alert("Permission with this Name already exists")
                 return false
             }
             else if (editMode) {
                 // Add Id if object already exists
-                var id = getPermissionId(permission)
-                if (id != -1) {
-                    permission.ID = id
+                if (editId != -1) {
+                    permission.ID = editId
                 }
                 editMode = false
+                editId = -1
             }
             SecurityManager.SavePermission(permission, reload, error);
         }

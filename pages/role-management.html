@@ -14,7 +14,7 @@
         var editId = -1;
 
         function validateRole(obj) {
-            var roles = SecurityManager.GetAllPermissions()
+            var roles = SecurityManager.GetAllRoles()
             console.log(roles)
             for (const role of roles) {
                 if (role.Name == obj.Name) {
@@ -28,23 +28,13 @@
             td.innerText = data;
             return td;
         }
-        function getRoleId(obj) {
-            var roles = SecurityManager.GetAllRoles()
-            for (const role of roles) {
-                if (role.Name == obj.Name) {
-                    return perm.ID
-                }
-            }
-            return -1
-        }
-
         function editRole(id) {
             editMode = true
             var row = gid("roles").rows[Number(id) + 1]
             id = Number(row.cells[0].innerText)
+            editId = id
             var perm = SecurityManager.GetRoleById(id)
             gid("role-name").value = perm.Name
-            gid("role-name").disabled = true
             gid("role-desc").value = perm.Description
 
         }
@@ -66,18 +56,17 @@
                 Name: gid("role-name").value,
                 Description: gid("role-desc").value
             }
-            console.log(role)
             if (!editMode && !validateRole(role)) {
                 alert("role with this Name already exists")
                 return false
             }
             else if (editMode) {
                 // Add Id if object already exists
-                var id = getRoleId(role)
-                if (id != -1) {
-                    role.ID = id
+                if (editId != -1) {
+                    role.ID = editId
                 }
                 editMode = false
+                editId = -1
             }
             SecurityManager.SaveRole(role, reload, error);
         }

@@ -23,37 +23,45 @@
             }
             return true
         }
+
+        function getRoleId(name) {
+            var roles = SecurityManager.GetAllRoles();
+            for (const role of roles) {
+                if (role.Name == name) {
+                    return role.ID
+                }
+            }
+        }
+
+        function getPermissionId(name) {
+            var perms = SecurityManager.GetAllPermissions();
+            for (const perm of perms) {
+                if (perm.Name == name) {
+                    return perm.ID
+                }
+            }
+        }
+
         function getTD(data) {
             var td = document.createElement("td");
             td.innerText = data;
             return td;
         }
-        function getRolePermissionsId(obj) {
-            var rolePermissions = SecurityManager.GetAllRolePermissions()
-            for (const rolePermission of rolePermissions) {
-                if (rolePermission.Role == obj.Role) {
-                    return rolePermission.ID
-                }
-            }
-            return -1
-        }
 
         function editRolePermissions(id) {
             editMode = true
-            var row = gid("role-permissions").rows[Number(id) + 1]
-            id = Number(row.cells[0].innerText)
             editId = id;
+            alert(editId)
             var rp = SecurityManager.GetRolePermissionById(id)
-            gid("select-role").value = rp.Role
+            gid("select-role").value = SecurityManager.GetRoleById(rp.Role).Name
             gid("select-role").disabled = true
-            gid("select-perm").value = rp.Permission
+            gid("select-perm").value = SecurityManager.GetPermissionById(rp.Permission).Name
         }
 
         function deleteRolePermissions(id) {
             var r = confirm("Are you sure you want to Delete?");
+            alert(id)
             if (r) {
-                var row = gid("role-permissions").rows[Number(id) + 1]
-                id = Number(row.cells[0].innerText)
                 SecurityManager.DeleteRolePermission(Number(id), reload, error)
             } else {
                 return;
@@ -63,14 +71,13 @@
 
         function saveRolePermissionsObject() {
             var rolePermission = {
-                Role: gid("select-role").value,
-                Permission: gid("select-perm").value
+                Role: getRoleId(gid("select-role").value),
+                Permission: getPermissionId(gid("select-perm").value)
             }
             if (!editMode && !validateRolePermissions(rolePermission)) {
                 alert("Role-Permission already exists")
                 return false
-            }
-            else if (editMode) {
+            } else if (editMode) {
                 // Add Id if object already exists
                 if (editId != -1) {
                     rolePermission.ID = editId
@@ -107,14 +114,20 @@
             loadPermOptions()
             var table = gid("role-permission-tbody");
             var data = SecurityManager.GetAllRolePermissions()
-            for (let i = 0; i < data.length; i++) {
-                var row = document.createElement("tr");
-                row.appendChild(getTD(data[i].ID))
-                row.appendChild(getTD(data[i].Role))
-                row.appendChild(getTD(data[i].Permission))
-                row.innerHTML += `<td><button id=${i} class="edit-btn" onclick="editRolePermissions(this.id)">Edit</button></td>`
-                row.innerHTML += `<td><button id=${i} onclick="deleteRolePermissions(this.id)" style="color:red;">Delete</button></td>`
-                table.appendChild(row)
+            for (const val of data) {
+                const r = SecurityManager.GetRoleById(Number(val.Role))
+                const p = SecurityManager.GetPermissionById(Number(val.Permission))
+                if (r && p) {
+                    var row = document.createElement("tr");
+                    row.appendChild(getTD(val.ID))
+                    row.appendChild(getTD(r.Name))
+                    row.appendChild(getTD(p.Name))
+                    row.innerHTML +=
+                        `<td><button id=${val.ID} class="edit-btn" onclick="editRolePermissions(${val.ID})">Edit</button></td>`
+                    row.innerHTML +=
+                        `<td><button id=${val.ID} onclick="deleteRolePermissions(${val.ID})" style="color:red;">Delete</button></td>`
+                    table.appendChild(row)
+                }
             }
         }
     </script>
